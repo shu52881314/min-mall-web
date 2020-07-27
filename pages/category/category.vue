@@ -36,16 +36,30 @@
 		},
 		methods: {
 			async loadData(){
-				let list = await this.$api.json('cateList');
-				list.forEach(item=>{
-					if(!item.pid){
-						this.flist.push(item);  //pid为父级id, 没有pid或者pid=0是一级分类
-					}else if(!item.picture){
-						this.slist.push(item); //没有图的是2级分类
-					}else{
-						this.tlist.push(item); //3级分类
+				this.getCateList(); 
+			},
+			getCateList(){
+				let _this=this;
+				uni.request({
+					url:'http://192.168.31.223:8900/getCateList',
+					method:'GET',
+					dataType:'JSON',
+					success: (res) => {
+						let list=res.data.dataList;
+						list.forEach(item=>{
+							if(item.type==1){
+								_this.flist.push(item);  //pid为父级id, 没有pid或者pid=0是一级分类
+							}else if(item.type==2){
+								_this.slist.push(item); //没有图的是2级分类
+							}else{
+								_this.tlist.push(item); //3级分类
+							}
+						});
+					},
+					fail: (res) => {
+						console.log(res);
 					}
-				}) 
+				});
 			},
 			//一级分类点击
 			tabtap(item){

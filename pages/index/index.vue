@@ -245,7 +245,6 @@
 				goodsList: []
 			};
 		},
-
 		onLoad() {
 			this.loadData();
 		},
@@ -255,12 +254,32 @@
 			 * 分次请求未作整合
 			 */
 			async loadData() {
-				let carouselList = await this.$api.json('carouselList');
-				this.titleNViewBackground = carouselList[0].background;
-				this.swiperLength = carouselList.length;
-				this.carouselList = carouselList;
+				//加载轮巡图片
+				this.getCarouselList();
+				//加载数据
+				this.goodsList = this.getGoodList();
+			},
+			getCarouselList(){
+				let _this=this;
 				uni.request({
-					url:'http://192.168.1.7:8800/getCommodityList',
+					url:'http://192.168.31.223:8900/getCarouselList',
+					method:'GET',
+					dataType:'JSON',
+					success: (res) => {
+						_this.carouselList = res.data.dataList;
+						_this.titleNViewBackground = _this.carouselList[0].background;
+						_this.swiperLength = _this.carouselList.length;
+						_this.carouselList = _this.carouselList;
+					},
+					fail: (res) => {
+						console.log();
+					}
+				});
+			},
+			getGoodList(){
+				let _this=this;
+				uni.request({
+					url:'http://192.168.31.223:8900/getCommodityList',
 					method:'GET',
 					dataType:'JSON',
 					data:{
@@ -268,14 +287,12 @@
 						pageSize:10
 					},
 					success: (res) => {
-						this.goodsList=res.data.dataList;
+						_this.goodsList = res.data.dataList;
 					},
 					fail: (res) => {
 						console.log();
 					}
-				})
-				// let goodsList = await this.$api.json('goodsList');carouselList
-				// this.goodsList = goodsList || [];
+				});
 			},
 			//轮播图切换修改背景色
 			swiperChange(e) {
